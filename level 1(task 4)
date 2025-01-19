@@ -1,0 +1,61 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# File path to the dataset
+file_path = r'C:\Users\Kesavaraj\Downloads\cognifyz-main\cognifyz-main\Dataset .csv'
+
+# Load the dataset into a DataFrame
+df = pd.read_csv(file_path)
+
+# Display the first few rows and column names for debugging
+print(df.head())
+print(df.columns)
+
+# Check for 'Has Online delivery' column
+if 'Has Online delivery' in df.columns:
+    # Standardize the 'Has Online delivery' column (lowercase and strip spaces)
+    df['Has Online delivery'] = df['Has Online delivery'].str.strip().str.lower()
+
+    total_restaurants = len(df)
+    restaurants_with_delivery = len(df[df['Has Online delivery'] == 'yes'])
+    percentage_with_delivery = (restaurants_with_delivery / total_restaurants) * 100
+
+    print(f"Percentage of restaurants with online delivery: {percentage_with_delivery:.2f}%")
+
+    # Visualize online delivery distribution
+    delivery_counts = df['Has Online delivery'].value_counts()
+    plt.figure(figsize=(8, 5))
+    plt.pie(delivery_counts, labels=delivery_counts.index, autopct='%1.1f%%', colors=['lightgreen', 'lightcoral'])
+    plt.title('Online Delivery Availability')
+    plt.show()
+else:
+    print("No 'Has Online delivery' column found in the dataset.")
+
+# Check for 'Aggregate rating' column and calculate averages
+if 'Aggregate rating' in df.columns and 'Has Online delivery' in df.columns:
+    # Filter out rows with missing or invalid ratings
+    df['Aggregate rating'] = pd.to_numeric(df['Aggregate rating'], errors='coerce')
+    df = df.dropna(subset=['Aggregate rating', 'Has Online delivery'])
+
+    average_rating_with_delivery = df[df['Has Online delivery'] == 'yes']['Aggregate rating'].mean()
+    average_rating_without_delivery = df[df['Has Online delivery'] == 'no']['Aggregate rating'].mean()
+
+    print(f"Average rating of restaurants with online delivery: {average_rating_with_delivery:.2f}")
+    print(f"Average rating of restaurants without online delivery: {average_rating_without_delivery:.2f}")
+
+    # Visualize average ratings comparison
+    ratings = {
+        'With Online Delivery': average_rating_with_delivery,
+        'Without Online Delivery': average_rating_without_delivery,
+    }
+
+    plt.figure(figsize=(8, 5))
+    plt.bar(ratings.keys(), ratings.values(), color=['skyblue', 'orange'])
+    plt.xlabel('Delivery Type', fontsize=12)
+    plt.ylabel('Average Rating', fontsize=12)
+    plt.title('Average Ratings: Online Delivery vs No Online Delivery', fontsize=14)
+    plt.ylim(0, 5)
+    plt.tight_layout()
+    plt.show()
+else:
+    print("No 'Aggregate rating' column found in the dataset or invalid values.")

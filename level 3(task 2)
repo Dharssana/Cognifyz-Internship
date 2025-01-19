@@ -1,0 +1,41 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset
+file_path = r'C:\Users\Kesavaraj\Downloads\cognifyz-main\cognifyz-main\Dataset .csv'
+df = pd.read_csv(file_path)
+
+# Ensure 'Votes' and 'Aggregate rating' columns are numeric
+df['Votes'] = pd.to_numeric(df['Votes'], errors='coerce')
+df['Aggregate rating'] = pd.to_numeric(df['Aggregate rating'], errors='coerce')
+
+# Drop rows with missing values in 'Votes' or 'Aggregate rating'
+df = df.dropna(subset=['Votes', 'Aggregate rating'])
+
+# Identify the restaurant with the highest number of votes
+highest_votes_restaurant = df.loc[df['Votes'].idxmax()]
+
+# Identify the restaurant with the lowest number of votes
+lowest_votes_restaurant = df.loc[df['Votes'].idxmin()]
+
+# Display the results
+print("Restaurant with the highest number of votes:")
+print(highest_votes_restaurant[['Restaurant Name', 'Votes', 'Aggregate rating']])
+
+print("\nRestaurant with the lowest number of votes:")
+print(lowest_votes_restaurant[['Restaurant Name', 'Votes', 'Aggregate rating']])
+
+# Analyze the correlation between Votes and Aggregate Rating
+correlation = df['Votes'].corr(df['Aggregate rating'])
+print(f"\nCorrelation between Votes and Aggregate Rating: {correlation:.2f}")
+
+# Visualize the correlation using a scatterplot
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='Votes', y='Aggregate rating', data=df, color='blue', alpha=0.6)
+plt.title('Correlation between Votes and Aggregate Rating', fontsize=14)
+plt.xlabel('Votes', fontsize=12)
+plt.ylabel('Aggregate Rating', fontsize=12)
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.tight_layout()
+plt.show()
